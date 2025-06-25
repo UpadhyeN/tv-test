@@ -1,0 +1,28 @@
+# Binaries
+main
+*.exe
+*.out
+
+# Go build cache
+/pkg
+/bin
+
+# Dependency and build artifacts
+*.test
+*.log
+*.tmp
+
+# Git
+.git
+.gitignore
+
+# OS & IDE junk
+.DS_Store
+.vscode
+.idea
+*.swp
+*.swo
+
+# Docker & CI
+.dockerignore
+docker-compose.yml
