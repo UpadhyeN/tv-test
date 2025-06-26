@@ -26,3 +26,9 @@ main
 # Docker & CI
 .dockerignore
 docker-compose.yml
+
+#ignore the helm chart
+go-app
+
+index.yaml
+*.tgz

@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  go-app:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2025-06-26T10:18:35.227957672+02:00"
+    description: A Helm chart for Kubernetes
+    digest: a1b0fbb895585046cfd5f31d19f62ab8dbe79175fb033438cd6e1b42955e9a50
+    name: go-app
+    type: application
+    urls:
+    - https://UpadhyeN.github.io/tv-test/go-app-0.1.0.tgz
+    version: 0.1.0
+generated: "2025-06-26T10:18:35.213253418+02:00"
