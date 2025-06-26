@@ -1,6 +1,14 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - main    # or your branch name
+
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
 
