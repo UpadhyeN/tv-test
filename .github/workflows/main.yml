@@ -1,4 +1,4 @@
-name: Build and Push Docker Image
+name: Build, Push and Scan Docker Image
 
 on:
   push:
@@ -26,3 +26,16 @@ jobs:
         with:
           push: true
           tags: megladonen/go-app:latest
+
+  security_scan:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Install Trivy
+        run: |
+          sudo apt-get update && sudo apt-get install -y wget
+          wget https://github.com/aquasecurity/trivy/releases/latest/download/trivy_0.44.1_Linux-64bit.deb
+          sudo dpkg -i trivy_0.44.1_Linux-64bit.deb
+
+      - name: Scan Docker image with Trivy
+        run: trivy image --severity HIGH,CRITICAL megladonen/go-app:latest
