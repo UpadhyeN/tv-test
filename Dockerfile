@@ -25,7 +25,7 @@ COPY --from=builder /app/main .
 # Change ownership to non-root user
 RUN chown appuser /app/main
 
-# Switch to non-root user some changes 
+# Switch to non-root user
 USER appuser
 
 EXPOSE 8080
