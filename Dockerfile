@@ -25,7 +25,7 @@ COPY --from=builder /app/main .
 # Change ownership to non-root user
 RUN chown appuser /app/main
 
-# Switch to non-root user
+# Switch to non-root user some changes to test CI job
 USER appuser
 
 EXPOSE 8080
