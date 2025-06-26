@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"math"
 	"net/http"
 	"os"
@@ -12,8 +13,6 @@ import (
 type Mass struct {
 	Density float64
 }
-
-// --- ADD YOUR CODE ---
 
 type MassVolume interface {
 	density() float64
@@ -44,23 +43,48 @@ func (c Cube) volume(d float64) float64 {
 	return math.Pow(d, 3)
 }
 
-// --- BETWEEN THOSE LINES ---
-
+// Handler with logging
 func Handler(massVolume MassVolume) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if dimension, err := strconv.ParseFloat(r.URL.Query().Get("dimension"), 64); err == nil {
-			weight := massVolume.density() * massVolume.volume(dimension)
-			w.Write([]byte(fmt.Sprintf("%.2f", math.Round(weight*100)/100)))
+		log.Printf("Received request: %s %s", r.Method, r.URL.Path)
+
+		dimensionStr := r.URL.Query().Get("dimension")
+		if dimensionStr == "" {
+			log.Printf("Missing 'dimension' parameter")
+			http.Error(w, "'dimension' query param is required", http.StatusBadRequest)
 			return
 		}
-		w.WriteHeader(http.StatusBadRequest)
+
+		dimension, err := strconv.ParseFloat(dimensionStr, 64)
+		if err != nil {
+			log.Printf("Invalid 'dimension' parameter: %v", err)
+			http.Error(w, "Invalid 'dimension' parameter", http.StatusBadRequest)
+			return
+		}
+
+		weight := massVolume.density() * massVolume.volume(dimension)
+		response := fmt.Sprintf("%.2f", math.Round(weight*100)/100)
+		w.Write([]byte(response))
+		log.Printf("Response: %s", response)
 	}
+}
+
+// Liveness probe handler
+func livenessHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("ok"))
+}
+
+// Readiness probe handler
+func readinessHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("ready"))
 }
 
 func main() {
 	port, err := strconv.Atoi(os.Args[1])
 	if err != nil {
-		panic(err)
+		log.Fatalf("Invalid port argument: %v", err)
 	}
 
 	aluminiumSphere := Sphere{Mass{Density: 2.710}} // g/cm³
@@ -69,7 +93,12 @@ func main() {
 	http.HandleFunc("/aluminium/sphere", Handler(aluminiumSphere))
 	http.HandleFunc("/iron/cube", Handler(ironCube))
 
+	// Add health endpoints
+	http.HandleFunc("/healthz", livenessHandler)
+	http.HandleFunc("/readyz", readinessHandler)
+
+	log.Printf("Starting server on port %d...", port)
 	if err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil); err != nil {
-		panic(err)
+		log.Fatalf("Server failed: %v", err)
 	}
 }
