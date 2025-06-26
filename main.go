@@ -9,7 +9,7 @@ import (
 	"strconv"
 )
 
-// mass is object that holds the density of a material
+// Mass represents an object that holds the density of a material
 type Mass struct {
 	Density float64
 }
@@ -43,7 +43,7 @@ func (c Cube) volume(d float64) float64 {
 	return math.Pow(d, 3)
 }
 
-// Handler with logging
+// Handler handles volume calculation requests with logging
 func Handler(massVolume MassVolume) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Received request: %s %s", r.Method, r.URL.Path)
@@ -69,13 +69,12 @@ func Handler(massVolume MassVolume) http.HandlerFunc {
 	}
 }
 
-// Liveness probe handler
+// Health endpoints
 func livenessHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("ok"))
 }
 
-// Readiness probe handler
 func readinessHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("ready"))
@@ -90,10 +89,11 @@ func main() {
 	aluminiumSphere := Sphere{Mass{Density: 2.710}} // g/cm³
 	ironCube := Cube{Mass{Density: 7.874}}          // g/cm³
 
+	// Business logic endpoints
 	http.HandleFunc("/aluminium/sphere", Handler(aluminiumSphere))
 	http.HandleFunc("/iron/cube", Handler(ironCube))
 
-	// Add health endpoints
+	// Health probe endpoints
 	http.HandleFunc("/healthz", livenessHandler)
 	http.HandleFunc("/readyz", readinessHandler)
 
